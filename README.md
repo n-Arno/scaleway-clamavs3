@@ -25,4 +25,6 @@ $ aws s3api head-object --bucket demo-arno --key clamav-testfile
 }
 ```
 
-NB: Current version of this demo will take a lot of time if the object is heavy.
+NB: Current version of this demo will take a lot of time if executed locally and the object is heavy due to download time.
+
+When run in Serverless CaaS (closer to the object storage), a 800 MB object was scanned in 25s.

@@ -1,5 +1,14 @@
-all:
-	docker build . -t clamavs3:latest
+deploy: node_modules
+	serverless deploy --verbose
 
-test:
-	./test.sh
+node_modules:
+	npm i
+
+clean: remove
+
+remove:
+	- serverless remove
+
+dist-clean: remove
+	- rm -rf node_modules package-lock.json
+	- find . -name .serverless -exec rm -rf "{}" +

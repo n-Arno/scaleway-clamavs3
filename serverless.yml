@@ -1,0 +1,34 @@
+service: clamavs3
+configValidationMode: off
+provider:
+  name: scaleway
+  scwRegion: fr-par
+
+plugins:
+  - serverless-scaleway-functions
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.gitignore'
+    - '!.git/**'
+    - '!Makefile'
+    - 'README.md'
+
+custom:
+  containers:
+    clamavs3:
+      directory: clamavs3
+      minScale: 1
+      maxScale: 1
+      memoryLimit: 2048
+      maxConcurrency: 10
+      timeout: '900s'
+      port: 8080
+      env:
+        REGION: 'fr-par'
+      secret:
+        LOGIN: test
+        PASSWORD: test
+        AWS_ACCESS_KEY_ID: ${SCW_ACCESS_KEY}
+        AWS_SECRET_ACCESS_KEY: ${SCW_SECRET_KEY}
