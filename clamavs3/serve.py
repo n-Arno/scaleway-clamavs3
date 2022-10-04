@@ -1,4 +1,4 @@
-import os, sys, uuid
+import os, sys, uuid, subprocess
 
 import pyclamd
 import boto3
@@ -15,6 +15,17 @@ def root_get():
     response.status = 200
     return {"status": "ok", "version": cd.version()}
 
+
+@route("/fresh", method="GET")
+@auth_basic(check_pass)
+def fresh_get():
+    exec = subprocess.run(["freshclam"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if exec.returncode == 0:
+        response.status = 200
+        return {"status": "ok", "result": exec.stdout.decode('utf-8')}
+    else:
+        response.status = 500
+        return {"status": "ko", "result": exec.stdout.decode('utf-8')}
 
 @route("/", method="POST")
 @auth_basic(check_pass)
