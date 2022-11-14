@@ -5,8 +5,11 @@ import boto3
 from botocore.exceptions import ClientError as BotoClientError
 from bottle import run, route, request, response, auth_basic
 
+
 def check_pass(username, password):
-    return username == os.environ.get("LOGIN") and password == os.environ.get("PASSWORD")
+    return username == os.environ.get("LOGIN") and password == os.environ.get(
+        "PASSWORD"
+    )
 
 
 @route("/", method="GET")
@@ -19,13 +22,16 @@ def root_get():
 @route("/fresh", method="GET")
 @auth_basic(check_pass)
 def fresh_get():
-    exec = subprocess.run(["freshclam"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    exec = subprocess.run(
+        ["freshclam"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
     if exec.returncode == 0:
         response.status = 200
-        return {"status": "ok", "result": exec.stdout.decode('utf-8')}
+        return {"status": "ok", "result": exec.stdout.decode("utf-8")}
     else:
         response.status = 500
-        return {"status": "ko", "result": exec.stdout.decode('utf-8')}
+        return {"status": "ko", "result": exec.stdout.decode("utf-8")}
+
 
 @route("/", method="POST")
 @auth_basic(check_pass)
@@ -65,8 +71,12 @@ def root_post():
         response.status = 200
         return {"status": "ok", "result": result}
     except BotoClientError as e:
-        response.status = int(e.response["Error"]["Code"])
-        return {"status": "ko", "reason": e.response["Error"]["Message"]}
+        response.status = int(e.response["ResponseMetadata"]["HTTPStatusCode"])
+        return {
+            "status": "ko",
+            "reason": f"BOTO error: {e.response['Error']['Message']}",
+        }
+
 
 if __name__ == "__main__":
-    run(host='0.0.0.0', port=8080, server='paste')
+    run(host="0.0.0.0", port=8080, server="paste")
